@@ -83,10 +83,13 @@ def is_table_relevant(xml_tablename: str, include_tables: list) -> bool:
 
 def create_database_table(engine: sqlalchemy.engine.Engine, xml_tablename: str) -> None:
     orm_class = tablename_mapping[xml_tablename]["__class__"]
-    # drop the content from table
-    orm_class.__table__.drop(engine, checkfirst=True)
-    # create table schema
-    orm_class.__table__.create(engine)
+    try:
+        # drop the content from table
+        orm_class.__table__.drop(engine, checkfirst=True)
+        # create table schema
+        orm_class.__table__.create(engine)
+    except:
+        orm_class.__table__.delete()
 
 
 def is_first_file(file_name: str) -> bool:
@@ -98,7 +101,6 @@ def is_first_file(file_name: str) -> bool:
 
 
 def cast_date_columns_to_datetime(xml_tablename: str, df: pd.DataFrame) -> pd.DataFrame:
-
     sqlalchemy_columnlist = tablename_mapping[xml_tablename][
         "__class__"
     ].__table__.columns.items()
@@ -186,7 +188,6 @@ def add_table_to_database(
     if_exists: str,
     engine: sqlalchemy.engine.Engine,
 ) -> None:
-
     # get a dictionary for the data types
 
     table_columns_list = list(
@@ -232,7 +233,8 @@ def add_table_to_database(
 
 def add_zero_as_first_character_for_too_short_string(df: pd.DataFrame) -> pd.DataFrame:
     """Some columns are read as integer even though they are actually strings starting with
-    a 0. This function converts those columns back to strings and adds a 0 as first character."""
+    a 0. This function converts those columns back to strings and adds a 0 as first character.
+    """
 
     dict_of_columns_and_string_length = {
         "Gemeindeschluessel": 8,
