@@ -18,6 +18,7 @@ Base = declarative_base(metadata=meta)
 
 
 class ParentAllTables(object):
+
     DatenQuelle = Column(String)
     DatumDownload = Column(Date)
 
@@ -73,6 +74,7 @@ class MissedAdditionalData(Base):
 
 
 class Extended(object):
+
     NetzbetreiberMastrNummer = Column(String)
     Registrierungsdatum = Column(Date)
     EinheitMastrNummer = Column(String, primary_key=True)
@@ -282,6 +284,7 @@ class StorageExtended(Extended, ParentAllTables, Base):
 
 
 class Eeg(object):
+
     Registrierungsdatum = Column(Date)
     EegMastrNummer = Column(String, primary_key=True)
     Meldedatum = Column(Date)
@@ -360,6 +363,7 @@ class HydroEeg(Eeg, ParentAllTables, Base):
 
     InstallierteLeistung = Column(Float)
     AnlageBetriebsstatus = Column(String)
+    Ertuechtigung = Column(JSON)
     ErtuechtigungIds = Column(String)
 
 

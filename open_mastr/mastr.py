@@ -64,6 +64,7 @@ class Mastr:
     """
 
     def __init__(self, engine="sqlite") -> None:
+
         validate_parameter_format_for_mastr_init(engine)
 
         self.home_directory = get_project_home_dir()
@@ -216,6 +217,7 @@ class Mastr:
         date = transform_date_parameter(method, date, **kwargs)
 
         if method == "bulk":
+
             # Find the name of the zipped xml folder
             bulk_download_date = parse_date_string(date)
             xml_folder_path = os.path.join(self.home_directory, "data", "xml_download")
@@ -346,6 +348,7 @@ class Mastr:
 
         # Export technologies to csv
         for tech in technologies_to_export:
+
             db_query_to_csv(
                 db_query=create_db_query(tech=tech, limit=limit, engine=self.engine),
                 data_table=tech,
@@ -353,6 +356,7 @@ class Mastr:
             )
         # Export additional tables to csv
         for addit_table in additional_tables_to_export:
+
             db_query_to_csv(
                 db_query=create_db_query(
                     additional_table=addit_table, limit=limit, engine=self.engine

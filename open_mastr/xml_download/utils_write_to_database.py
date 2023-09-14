@@ -83,13 +83,10 @@ def is_table_relevant(xml_tablename: str, include_tables: list) -> bool:
 
 def create_database_table(engine: sqlalchemy.engine.Engine, xml_tablename: str) -> None:
     orm_class = tablename_mapping[xml_tablename]["__class__"]
-    try:
-        # drop the content from table
-        orm_class.__table__.drop(engine, checkfirst= True)
-        # create table schema
-        orm_class.__table__.create(engine)
-    except:
-        orm_class.__table__.delete()
+    # drop the content from table
+    orm_class.__table__.drop(engine, checkfirst=True)
+    # create table schema
+    orm_class.__table__.create(engine)
 
 
 def is_first_file(file_name: str) -> bool:
