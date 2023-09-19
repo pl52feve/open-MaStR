@@ -11,6 +11,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 """
 
 from open_mastr import Mastr
+from sqlalchemy import create_engine, text
+from sshtunnel import SSHTunnelForwarder
+from dotenv import load_dotenv
+import os
 
 ## specify download parameter
 
@@ -63,29 +67,48 @@ api_location_types = [
     "location_gas_consumption",
 ]
 
-# instantiate Mastr class
-db = Mastr()
 
-if __name__ == "__main__":
-    ## download Markstammdatenregister
-    # bulk download
-    db.download(method="bulk", data=data_bulk, date=bulk_date, bulk_cleansing=True)
+def mastr_temp_update():
+    """Update the temporary MaStR version."""
+    load_dotenv()
 
-    # API download
-    db.download(
-        method="API",
-        data=data_api,
-        date=api_date,
-        api_processes=api_processes,
-        api_limit=api_limit,
-        api_chunksize=api_chunksize,
-        api_data_types=api_data_types,
-        api_location_types=api_location_types,
+    SSH_ADDRESS = os.getenv("SSH_HOST")
+    SSH_PORT = int(os.getenv("SSH_PORT"))
+    PATH_PKEY_SSH = os.getenv("PATH_PKEY_SSH")
+    SSH_USERNAME = os.getenv("SSH_USERNAME")
+    SSH_PASSPHRASE = os.getenv("SSH_PASSPHRASE")
+    LOCAL_HOST = os.getenv("LOCAL_HOST")
+    LOCAL_PORT = int(os.getenv("LOCAL_PORT"))
+    USERNAME_POSTGRES = os.getenv("USERNAME_POSTGRES")
+    PASSWORD_POSTGRES = os.getenv("PASSWORD_POSTGRES")
+    POSTGRES_DB = os.getenv("POSTGRES_DB")
+    FACT_SCHEMA = os.getenv("FACT_SCHEMA")
+
+    server = SSHTunnelForwarder(
+        ssh_address_or_host=(SSH_ADDRESS, SSH_PORT),
+        ssh_pkey=PATH_PKEY_SSH,
+        ssh_username=SSH_USERNAME,
+        ssh_password=SSH_PASSPHRASE,
+        remote_bind_address=(LOCAL_HOST, LOCAL_PORT),
+    )
+    server.start()
+    LOCAL_PORT = str(server.local_bind_port)
+
+    engine = create_engine(
+        f"postgresql://{USERNAME_POSTGRES}:{PASSWORD_POSTGRES}@{LOCAL_HOST}:"
+        f"{LOCAL_PORT}/{POSTGRES_DB}",
+        echo=True,
+        execution_options={"schema_translate_map": {None: FACT_SCHEMA}},
     )
 
-    ## export to csv
-    """
-    Technology-related tables are exported as joined, whereas additional tables
-    are duplicated as they are in the database. 
-    """
-    db.to_csv()
+    with engine.connect() as conn:
+        conn.execute(text(f"SET search_path TO {FACT_SCHEMA}"))
+
+    engine.connect()
+    db = Mastr(engine=engine)
+    db.download(data=["solar", "wind", "hydro", "biomass"])
+
+
+if __name__ == "__main__":
+    # update MaStR
+    mastr_temp_update()
