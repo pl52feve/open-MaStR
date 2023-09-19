@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import sqlite3
 import sqlalchemy
-from sqlalchemy import select
+from sqlalchemy import select, exc
 from sqlalchemy.sql import text
 
 from open_mastr.utils.helpers import data_to_include_tables
@@ -64,6 +64,9 @@ def write_mastr_xml_to_database(
                     if_exists="append",
                     engine=engine,
                 )
+
+                schema = engine._execution_options["schema_translate_map"]["_none"]
+                overwrite_usergroup(engine=engine, schema=schema, table=sql_tablename)
     print("Bulk download and data cleansing were successful.")
 
 
@@ -387,3 +390,28 @@ def handle_xml_syntax_error(data: bytes, err: Error) -> pd.DataFrame:
     df = pd.read_xml(decoded_data)
     print("One invalid xml expression was deleted.")
     return df
+
+
+def overwrite_usergroup(engine: sqlalchemy.engine.Engine, schema: str, table: str):
+    """_summary_
+
+    Parameters
+    ----------
+    engine : sqlalchemy.engine.Engine
+        _description_
+    schema : str
+        _description_
+    table : str
+        _description_
+    """
+    log = setup_logger()
+    ownership_query = text(f"ALTER TABLE {schema}.{table} OWNER TO sch_{schema}")
+    try:
+        with engine.connect() as connection:
+            connection.execute(ownership_query)
+            connection.commit()
+    except exc.SQLAlchemyError as sqlerr:
+        log.error(
+            f"The usergroup for {schema}.{table} couldn't be set correctly."
+            f"The process excited with {sqlerr}."
+        )
