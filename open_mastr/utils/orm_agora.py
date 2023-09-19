@@ -5,12 +5,9 @@ from sqlalchemy import (
     Integer,
     String,
     Float,
-    Sequence,
     DateTime,
     Boolean,
-    func,
     Date,
-    JSON,
 )
 
 meta = MetaData()
