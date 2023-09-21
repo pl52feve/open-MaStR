@@ -101,10 +101,6 @@ def mastr_temp_update():
         execution_options={"schema_translate_map": {None: FACT_SCHEMA}},
     )
 
-    with engine.connect() as conn:
-        conn.execute(text(f"SET search_path TO {FACT_SCHEMA}"))
-
-    engine.connect()
     db = Mastr(engine=engine)
     db.download(data=["solar", "wind", "hydro", "biomass"])
 
