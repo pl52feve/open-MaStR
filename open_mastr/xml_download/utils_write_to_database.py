@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import sqlite3
 import sqlalchemy
-from sqlalchemy import select
+from sqlalchemy import select, exc
 from sqlalchemy.sql import text
 
 from open_mastr.utils.helpers import data_to_include_tables
@@ -62,8 +62,10 @@ def write_mastr_xml_to_database(
                     xml_tablename=xml_tablename,
                     sql_tablename=sql_tablename,
                     if_exists="append",
+                    schema=engine._execution_options["schema_translate_map"]["_none"],
                     engine=engine,
                 )
+                alter_usergroup(engine=engine, table=sql_tablename)
     print("Bulk download and data cleansing were successful.")
 
 
@@ -185,6 +187,7 @@ def add_table_to_database(
     df: pd.DataFrame,
     xml_tablename: str,
     sql_tablename: str,
+    schema: str,
     if_exists: str,
     engine: sqlalchemy.engine.Engine,
 ) -> None:
@@ -209,6 +212,7 @@ def add_table_to_database(
                         con=con,
                         index=False,
                         if_exists=if_exists,
+                        schema=schema,
                         dtype=dtypes_for_writing_sql,
                     )
                     continueloop = False
@@ -387,3 +391,18 @@ def handle_xml_syntax_error(data: bytes, err: Error) -> pd.DataFrame:
     df = pd.read_xml(decoded_data)
     print("One invalid xml expression was deleted.")
     return df
+
+
+def alter_usergroup(engine: sqlalchemy.engine.Engine, table: str):
+    log = setup_logger()
+    schema = engine._execution_options["schema_translate_map"]["_none"]
+    ownership_query = text(f"ALTER TABLE {schema}.{table} OWNER TO sch_{schema}")
+    try:
+        with engine.connect() as connection:
+            connection.execute(ownership_query)
+            connection.commit()
+    except exc.SQLAlchemyError as sqlerr:
+        log.error(
+            f"Ownership of table {schema}.{table} wasn't adjusted correctly. "
+            f"The process exited with {sqlerr}."
+        )
