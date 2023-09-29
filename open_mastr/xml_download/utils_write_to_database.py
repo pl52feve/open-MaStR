@@ -9,7 +9,7 @@ from sqlalchemy import select, exc
 from sqlalchemy.sql import text
 
 from open_mastr.utils.helpers import data_to_include_tables
-from open_mastr.utils.orm import tablename_mapping
+from open_mastr.utils.orm_temp import tablename_mapping
 from open_mastr.xml_download.utils_cleansing_bulk import cleanse_bulk_data
 from open_mastr.utils.config import setup_logger
 
@@ -201,6 +201,8 @@ def add_table_to_database(
         for column in table_columns_list
         if column.name in df.columns
     }
+
+    df = df[dtypes_for_writing_sql.keys()]
 
     continueloop = True
     while continueloop:
