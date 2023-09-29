@@ -5,10 +5,9 @@ from sqlalchemy import (
     Integer,
     String,
     Float,
-    Sequence,
+    Numeric,
     DateTime,
     Boolean,
-    func,
     Date,
     JSON,
 )
@@ -18,14 +17,9 @@ Base = declarative_base(metadata=meta)
 
 
 class Extended(object):
-    NetzbetreiberMastrNummer = Column(String)
     Registrierungsdatum = Column(Date)
     EinheitMastrNummer = Column(String, primary_key=True)
     DatumLetzteAktualisierung = Column(DateTime(timezone=True))
-    LokationMastrNummer = Column(String)
-    NetzbetreiberpruefungStatus = Column(String)
-    NetzbetreiberpruefungDatum = Column(Date)
-    AnlagenbetreiberMastrNummer = Column(String)
     Land = Column(String)
     Bundesland = Column(String)
     Landkreis = Column(String)
@@ -40,13 +34,6 @@ class Extended(object):
     HausnummerNichtGefunden = Column(Boolean)
     Adresszusatz = Column(String)
     Ort = Column(String)
-    Laengengrad = Column(Float)
-    Breitengrad = Column(Float)
-    UtmZonenwert = Column(String)
-    UtmEast = Column(Float)
-    UtmNorth = Column(Float)
-    GaussKruegerHoch = Column(Float)
-    GaussKruegerRechts = Column(Float)
     Meldedatum = Column(Date)
     GeplantesInbetriebnahmedatum = Column(Date)
     Inbetriebnahmedatum = Column(Date)
@@ -56,33 +43,14 @@ class Extended(object):
     DatumWiederaufnahmeBetrieb = Column(Date)
     EinheitSystemstatus = Column(String)
     EinheitBetriebsstatus = Column(String)
-    BestandsanlageMastrNummer = Column(String)
-    NichtVorhandenInMigriertenEinheiten = Column(Boolean)
-    AltAnlagenbetreiberMastrNummer = Column(String)
     DatumDesBetreiberwechsels = Column(Date)
     DatumRegistrierungDesBetreiberwechsels = Column(Date)
     NameStromerzeugungseinheit = Column(String)
-    Weic = Column(String)
-    WeicDisplayName = Column(String)
-    Kraftwerksnummer = Column(String)
     Energietraeger = Column(String)
-    Bruttoleistung = Column(Float)
-    Nettonennleistung = Column(Float)
-    AnschlussAnHoechstOderHochSpannung = Column(Boolean)
-    Schwarzstartfaehigkeit = Column(Boolean)
-    Inselbetriebsfaehigkeit = Column(Boolean)
-    Einsatzverantwortlicher = Column(String)
-    FernsteuerbarkeitNb = Column(Boolean)
-    FernsteuerbarkeitDv = Column(Boolean)
-    FernsteuerbarkeitDr = Column(Boolean)
+    Bruttoleistung = Column(Numeric(precision=18, scale=3))
+    Nettonennleistung = Column(Numeric(precision=18, scale=3))
     Einspeisungsart = Column(String)
-    PraequalifiziertFuerRegelenergie = Column(Boolean)
     GenMastrNummer = Column(String)
-    Netzbetreiberzuordnungen = Column(String)
-    # from bulk download
-    Hausnummer_nv = Column(Boolean)
-    Weic_nv = Column(Boolean)
-    Kraftwerksnummer_nv = Column(Boolean)
 
 
 class WindExtended(Extended, Base):
@@ -94,47 +62,26 @@ class WindExtended(Extended, Base):
     Seelage = Column(String)
     ClusterOstsee = Column(String)
     ClusterNordsee = Column(String)
-    Hersteller = Column(String)
-    HerstellerId = Column(String)
     Technologie = Column(String)
     Typenbezeichnung = Column(String)
-    Nabenhoehe = Column(Float)
-    Rotordurchmesser = Column(Float)
-    Rotorblattenteisungssystem = Column(Boolean)
-    AuflageAbschaltungLeistungsbegrenzung = Column(Boolean)
-    AuflagenAbschaltungSchallimmissionsschutzNachts = Column(Boolean)
-    AuflagenAbschaltungSchallimmissionsschutzTagsueber = Column(Boolean)
-    AuflagenAbschaltungSchattenwurf = Column(Boolean)
-    AuflagenAbschaltungTierschutz = Column(Boolean)
-    AuflagenAbschaltungEiswurf = Column(Boolean)
-    AuflagenAbschaltungSonstige = Column(Boolean)
-    Wassertiefe = Column(Float)
-    Kuestenentfernung = Column(Float)
+    Nabenhoehe = Column(Numeric(precision=18, scale=3))
+    Rotordurchmesser = Column(Numeric(precision=18, scale=3))
+    Wassertiefe = Column(Numeric(precision=18, scale=3))
+    Kuestenentfernung = Column(Numeric(precision=18, scale=3))
     Buergerenergie = Column(Boolean)
-    Nachtkennzeichen = Column(Boolean)
     EegMastrNummer = Column(String)
 
 
 class SolarExtended(Extended, Base):
     __tablename__ = "solar_extended"
 
-    ZugeordneteWirkleistungWechselrichter = Column(Float)
-    GemeinsamerWechselrichterMitSpeicher = Column(String)
     AnzahlModule = Column(Integer)
     Lage = Column(String)
     Leistungsbegrenzung = Column(String)
-    EinheitlicheAusrichtungUndNeigungswinkel = Column(Boolean)
-    Hauptausrichtung = Column(String)
-    HauptausrichtungNeigungswinkel = Column(String)
-    Nebenausrichtung = Column(String)
-    NebenausrichtungNeigungswinkel = Column(String)
-    InAnspruchGenommeneFlaeche = Column(Float)
+    InAnspruchGenommeneFlaeche = Column(Numeric(precision=18, scale=3))
     ArtDerFlaeche = Column(String)
-    InAnspruchGenommeneAckerflaeche = Column(Float)
-    Nutzungsbereich = Column(String)
-    Buergerenergie = Column(Boolean)
+    InAnspruchGenommeneAckerflaeche = Column(Numeric(precision=18, scale=3))
     EegMastrNummer = Column(String)
-    ArtDerFlaecheIds = Column(String)
 
 
 class BiomassExtended(Extended, Base):
@@ -144,7 +91,6 @@ class BiomassExtended(Extended, Base):
     Biomasseart = Column(String)
     Technologie = Column(String)
     EegMastrNummer = Column(String)
-    KwkMastrNummer = Column(String)
 
 
 class HydroExtended(Extended, Base):
@@ -155,9 +101,7 @@ class HydroExtended(Extended, Base):
     AnzeigeEinerStilllegung = Column(Boolean)
     ArtDerStilllegung = Column(String)
     DatumBeginnVorlaeufigenOderEndgueltigenStilllegung = Column(Date)
-    MinderungStromerzeugung = Column(Boolean)
-    BestandteilGrenzkraftwerk = Column(Boolean)
-    NettonennleistungDeutschland = Column(Float)
+    NettonennleistungDeutschland = Column(Numeric(precision=18, scale=3))
     ArtDesZuflusses = Column(String)
     EegMastrNummer = Column(String)
 
@@ -169,73 +113,59 @@ class Eeg(object):
     DatumLetzteAktualisierung = Column(DateTime(timezone=True))
     EegInbetriebnahmedatum = Column(Date)
     VerknuepfteEinheit = Column(String)
-    AnlagenschluesselEeg = Column(String)
-    AusschreibungZuschlag = Column(Boolean)
-    AnlagenkennzifferAnlagenregister = Column(String)
-    AnlagenkennzifferAnlagenregister_nv = Column(Boolean)
-    Netzbetreiberzuordnungen = Column(String)
 
 
 class WindEeg(Eeg, Base):
     __tablename__ = "wind_eeg"
 
-    PrototypAnlage = Column(Boolean)
-    PilotAnlage = Column(Boolean)
-    InstallierteLeistung = Column(Float)
-    VerhaeltnisErtragsschaetzungReferenzertrag = Column(Float)
-    VerhaeltnisReferenzertragErtrag5Jahre = Column(Float)
-    VerhaeltnisReferenzertragErtrag10Jahre = Column(Float)
-    VerhaeltnisReferenzertragErtrag15Jahre = Column(Float)
-    Zuschlagsnummer = Column(String)
+    InstallierteLeistung = Column(Numeric(precision=18, scale=3))
     AnlageBetriebsstatus = Column(String)
-    VerhaeltnisErtragsschaetzungReferenzertrag_nv = Column(Boolean)
-    VerhaeltnisReferenzertragErtrag5Jahre_nv = Column(Boolean)
-    VerhaeltnisReferenzertragErtrag10Jahre_nv = Column(Boolean)
-    VerhaeltnisReferenzertragErtrag15Jahre_nv = Column(Boolean)
 
 
 class SolarEeg(Eeg, Base):
     __tablename__ = "solar_eeg"
 
     InanspruchnahmeZahlungNachEeg = Column(Boolean)
-    InstallierteLeistung = Column(Float)
-    RegistrierungsnummerPvMeldeportal = Column(String)
-    MieterstromRegistrierungsdatum = Column(Date)
-    MieterstromZugeordnet = Column(Boolean)
-    MieterstromMeldedatum = Column(Date)
-    MieterstromErsteZuordnungZuschlag = Column(Date)
-    ZugeordneteGebotsmenge = Column(Float)
-    Zuschlagsnummer = Column(String)
+    InstallierteLeistung = Column(Numeric(precision=18, scale=3))
     AnlageBetriebsstatus = Column(String)
-    RegistrierungsnummerPvMeldeportal_nv = Column(Boolean)
 
 
 class BiomassEeg(Eeg, Base):
     __tablename__ = "biomass_eeg"
 
-    InstallierteLeistung = Column(Float)
-    AusschliesslicheVerwendungBiomasse = Column(Boolean)
+    InstallierteLeistung = Column(Numeric(precision=18, scale=3))
     Zuschlagsnummer = Column(String)
-    BiogasInanspruchnahmeFlexiPraemie = Column(Boolean)
-    BiogasDatumInanspruchnahmeFlexiPraemie = Column(Date)
-    BiogasLeistungserhoehung = Column(Boolean)
     BiogasDatumLeistungserhoehung = Column(Date)
-    BiogasUmfangLeistungserhoehung = Column(Float)
-    BiogasGaserzeugungskapazitaet = Column(Float)
-    Hoechstbemessungsleistung = Column(Float)
-    BiomethanErstmaligerEinsatz = Column(Date)
+    BiogasUmfangLeistungserhoehung = Column(Numeric(precision=18, scale=3))
+    BiogasGaserzeugungskapazitaet = Column(Numeric(precision=18, scale=3))
+    Hoechstbemessungsleistung = Column(Numeric(precision=18, scale=3))
     AnlageBetriebsstatus = Column(String)
-    BiogasGaserzeugungskapazitaet_nv = Column(Boolean)
-    BiomethanErstmaligerEinsatz_nv = Column(Boolean)
 
 
 class HydroEeg(Eeg, Base):
     __tablename__ = "hydro_eeg"
 
-    InstallierteLeistung = Column(Float)
+    InstallierteLeistung = Column(Numeric(precision=18, scale=3))
     AnlageBetriebsstatus = Column(String)
     Ertuechtigung = Column(JSON)
-    ErtuechtigungIds = Column(String)
+
+
+class Permit(Base):
+    __tablename__ = "permit"
+
+    Registrierungsdatum = Column(Date)
+    GenMastrNummer = Column(String, primary_key=True)
+    DatumLetzteAktualisierung = Column(DateTime(timezone=True))
+    Art = Column(String)
+    Datum = Column(Date)
+    Behoerde = Column(String)
+    Aktenzeichen = Column(String)
+    Frist = Column(Date)
+    WasserrechtsNummer = Column(String)
+    WasserrechtAblaufdatum = Column(Date)
+    Meldedatum = Column(Date)
+    VerknuepfteEinheiten = Column(String)
+    Netzbetreiberzuordnungen = Column(String)
 
 
 tablename_mapping = {
@@ -257,6 +187,16 @@ tablename_mapping = {
             "LokationMaStRNummer": "LokationMastrNummer",
         },
     },
+    "anlageneeggeothermiegrubengasdruckentspannung": {
+        "__name__": "anlageneeggeothermiegrubengasdruckentspannung",
+        "__class__": None,
+        "replace_column_names": None,
+    },
+    "einheitengeothermiegrubengasdruckentspannung": {
+        "__name__": "einheitengeothermiegrubengasdruckentspannung",
+        "__class__": None,
+        "replace_column_names": None,
+    },
     "anlageneegsolar": {
         "__name__": SolarEeg.__tablename__,
         "__class__": SolarEeg,
@@ -273,6 +213,11 @@ tablename_mapping = {
             "LokationMaStRNummer": "LokationMastrNummer",
             "VerknuepfteEinheitenMaStRNummern": "VerknuepfteEinheit",
         },
+    },
+    "anlageneegspeicher": {
+        "__name__": "anlageneegspeicher",
+        "__class__": None,
+        "replace_column_names": None,
     },
     "anlageneegwasser": {
         "__name__": HydroEeg.__tablename__,
@@ -307,6 +252,94 @@ tablename_mapping = {
             "Nachtkennzeichnung": "Nachtkennzeichen",
         },
     },
+    "anlagengasspeicher": {
+        "__name__": "anlagengasspeicher",
+        "__class__": None,
+        "replace_column_names": None,
+    },
+    "einheitengasspeicher": {
+        "__name__": "einheitengasspeicher",
+        "__class__": None,
+        "replace_column_names": None,
+    },
+    "anlagenkwk": {
+        "__name__": "anlagenkwk",
+        "__class__": None,
+        "replace_column_names": None,
+    },
+    "anlagenstromspeicher": {
+        "__name__": "anlagenstromspeicher",
+        "__class__": None,
+        "replace_column_names": None,
+    },
+    "bilanzierungsgebiete": {
+        "__name__": "bilanzierungsgebiete",
+        "__class__": None,
+        "replace_column_names": None,
+    },
+    "einheitengaserzeuger": {
+        "__name__": "einheitengaserzeuger",
+        "__class__": None,
+        "replace_column_names": None,
+    },
+    "einheitengasverbraucher": {
+        "__name__": "einheitengasverbraucher",
+        "__class__": None,
+        "replace_column_names": None,
+    },
+    "einheitengenehmigung": {
+        "__name__": Permit.__tablename__,
+        "__class__": Permit,
+        "replace_column_names": {
+            "VerknuepfteEinheitenMaStRNummern": "VerknuepfteEinheiten"
+        },
+    },
+    "einheitenkernkraft": {
+        "__name__": "einheitenkernkraft",
+        "__class__": None,
+        "replace_column_names": None,
+    },
+    "einheitenstromverbraucher": {
+        "__name__": "einheitenstromverbraucher",
+        "__class__": None,
+        "replace_column_names": None,
+    },
+    "einheitenstromspeicher": {
+        "__name__": "einheitenstromspeicher",
+        "__class__": None,
+        "replace_column_names": None,
+    },
+    "einheitenverbrennung": {
+        "__name__": "einheitenverbrennung",
+        "__class__": None,
+        "replace_column_names": None,
+    },
+    "ertuechtigungen": {
+        "__name__": "ertuechtigungen",
+        "__class__": None,
+        "replace_column_names": None,
+    },
+    "geloeschteunddeaktivierteeinheiten": {
+        "__name__": "geloeschteunddeaktivierteeinheiten",
+        "__class__": None,
+        "replace_column_names": None,
+    },
+    "marktrollen": {
+        "__name__": "marktrollen",
+        "__class__": None,
+        "replace_column_names": None,
+    },
+    "marktakteure": {
+        "__name__": "marktakteure",
+        "__class__": None,
+        "replace_column_names": None,
+    },
+    "netze": {"__name__": "netze", "__class__": None, "replace_column_names": None},
+    "netzanschlusspunkte": {
+        "__name__": "netzanschlusspunkte",
+        "__class__": None,
+        "replace_column_names": None,
+    },
     "katalogkategorien": {
         "__name__": "katalogkategorien",
         "__class__": None,
@@ -314,6 +347,11 @@ tablename_mapping = {
     },
     "katalogwerte": {
         "__name__": "katalogwerte",
+        "__class__": None,
+        "replace_column_names": None,
+    },
+    "lokationen": {
+        "__name__": "lokationen",
         "__class__": None,
         "replace_column_names": None,
     },
