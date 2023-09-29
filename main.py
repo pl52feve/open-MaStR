@@ -9,63 +9,11 @@ API: Download latest entries using the SOAP-API.
 
 SPDX-License-Identifier: AGPL-3.0-or-later
 """
-
-from open_mastr import Mastr
-from sqlalchemy import create_engine, text
+import os
 from sshtunnel import SSHTunnelForwarder
 from dotenv import load_dotenv
-import os
-
-## specify download parameter
-
-# bulk download
-bulk_date = "today"
-bulk_cleansing = True
-data_bulk = [
-    "biomass",
-    "combustion",
-    "gsgk",
-    "hydro",
-    "nuclear",
-    "solar",
-    "storage",
-    "wind",
-    "balancing_area",
-    "electricity_consumer",
-    "gas",
-    "grid",
-    "location",
-    "market",
-    "permit",
-]
-
-# API download
-# for parameter explanation see: https://open-mastr.readthedocs.io/en/latest/getting_started.html#api-download
-
-api_date = "latest"
-api_chunksize = 10
-api_limit = 10
-api_processes = None
-
-data_api = [
-    "biomass",
-    "combustion",
-    "gsgk",
-    "hydro",
-    "nuclear",
-    "solar",
-    "storage",
-    "wind",
-]
-
-api_data_types = ["unit_data", "eeg_data", "kwk_data", "permit_data"]
-
-api_location_types = [
-    "location_elec_generation",
-    "location_elec_consumption",
-    "location_gas_generation",
-    "location_gas_consumption",
-]
+from sqlalchemy import create_engine
+from open_mastr import Mastr
 
 
 def mastr_temp_update():
@@ -102,7 +50,7 @@ def mastr_temp_update():
     )
 
     db = Mastr(engine=engine)
-    db.download(data=["solar", "wind", "hydro", "biomass"])
+    db.download(data=["solar", "wind", "hydro", "biomass", "permit"])
 
 
 if __name__ == "__main__":
