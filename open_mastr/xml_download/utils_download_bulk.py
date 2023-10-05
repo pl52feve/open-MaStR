@@ -10,6 +10,7 @@ from tqdm import tqdm
 
 # setup logger
 from open_mastr.utils.config import setup_logger
+from open_mastr.xml_download.exception_handler import download_exception_handler
 
 log = setup_logger()
 
@@ -31,6 +32,7 @@ def get_url_from_Mastr_website() -> str:
     return str(element).split('href="')[1].split('" title')[0]
 
 
+@download_exception_handler
 def download_xml_Mastr(
     save_path: str, bulk_date_string: str, xml_folder_path: str
 ) -> None:

@@ -12,8 +12,10 @@ from open_mastr.utils.helpers import data_to_include_tables
 from open_mastr.utils.orm_temp import tablename_mapping
 from open_mastr.xml_download.utils_cleansing_bulk import cleanse_bulk_data
 from open_mastr.utils.config import setup_logger
+from open_mastr.xml_download.exception_handler import db_exception_handler
 
 
+@db_exception_handler
 def write_mastr_xml_to_database(
     engine: sqlalchemy.engine.Engine,
     zipped_xml_file_path: str,
