@@ -331,7 +331,10 @@ def add_missing_column_to_table(
     log = setup_logger()
 
     if engine.name == "postgresql":
-        missing_column = err.args[0].split("»")[1].split("«")[0]
+        try:
+            missing_column = err.args[0].split("»")[1].split("«")[0]
+        except IndexError as err:
+            print(err.args[0])
     elif engine.name == "sqlite":
         missing_column = err.args[0].split()[-1]
     else:
