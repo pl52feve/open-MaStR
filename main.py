@@ -10,15 +10,51 @@ API: Download latest entries using the SOAP-API.
 SPDX-License-Identifier: AGPL-3.0-or-later
 """
 import os
+import time
+import logging
+from logging.handlers import SMTPHandler
 from sshtunnel import SSHTunnelForwarder
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from open_mastr import Mastr
 
 
+load_dotenv()
+EMAIL_FROM_USR = os.getenv("EMAIL_FROM_USR")
+EMAIL_FROM_PASS = os.getenv("EMAIL_FROM_PASS")
+EMAIL_TO = os.getenv("EMAIL_TO")
+
+smtp_handler = SMTPHandler(
+    mailhost=("mail.dotplex.com", 25),
+    secure=(),
+    credentials=(EMAIL_FROM_USR, EMAIL_FROM_PASS),
+    fromaddr=EMAIL_FROM_USR,
+    toaddrs=EMAIL_TO,
+    subject="system error - log",
+)
+smtp_handler.setLevel(logging.ERROR)
+mail_handler = logging.getLogger(__name__)
+mail_handler.addHandler(smtp_handler)
+mail_handler.setLevel(logging.ERROR)
+
+
+def retry_function(func, max_retries=3, retry_delay=1):
+    retries = 0
+    while retries < max_retries:
+        try:
+            result = func()
+            return result  # If the function succeeds, return its result
+        except Exception as e:
+            print(f"Attempt {retries + 1} failed with error: {str(e)}")
+            time.sleep(retry_delay)  # Wait for a short period before retrying
+            retries += 1
+
+    print(f"Function failed after {max_retries} attempts")
+    raise Exception("Max retries exceeded")
+
+
 def mastr_temp_update():
     """Update the temporary MaStR version."""
-    load_dotenv()
 
     SSH_ADDRESS = os.getenv("SSH_HOST")
     SSH_PORT = int(os.getenv("SSH_PORT"))
@@ -55,4 +91,10 @@ def mastr_temp_update():
 
 if __name__ == "__main__":
     # update MaStR
-    mastr_temp_update()
+    try:
+        result = retry_function(mastr_temp_update)
+        print(f"Function succeeded with result: {result}")
+    except Exception as err:
+        mail_handler.exception(
+            f"After three retries MaStR couldn't be updatet with {err}."
+        )
