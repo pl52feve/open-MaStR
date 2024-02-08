@@ -26,6 +26,8 @@ class Extended(object):
     Gemeinde = Column(String)
     Gemeindeschluessel = Column(String)
     Postleitzahl = Column(String)
+    Laengengrad = Column(Float)
+    Breitengrad = Column(Float)
     Gemarkung = Column(String)
     FlurFlurstuecknummern = Column(String)
     Strasse = Column(String)
