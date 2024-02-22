@@ -53,6 +53,13 @@ class Extended(object):
     Nettonennleistung = Column(Numeric(precision=18, scale=3))
     Einspeisungsart = Column(String)
     GenMastrNummer = Column(String)
+    FernsteuerbarkeitNb = Column(Boolean)
+    FernsteuerbarkeitDv = Column(Boolean)
+    FernsteuerbarkeitDr = Column(Boolean)
+    Weic = Column(String)
+    WeicDisplayName = Column(String)
+    Kraftwerksnummer = Column(String)
+    Einsatzverantwortlicher = Column(String)
 
 
 class WindExtended(Extended, Base):
@@ -72,6 +79,20 @@ class WindExtended(Extended, Base):
     Kuestenentfernung = Column(Numeric(precision=18, scale=3))
     Buergerenergie = Column(Boolean)
     EegMastrNummer = Column(String)
+    Hersteller = Column(String)
+    HerstellerId = Column(String)
+    Typenbezeichnung = Column(String)
+    Nabenhoehe = Column(Float)
+    Rotordurchmesser = Column(Float)
+    Rotorblattenteisungssystem = Column(Boolean)
+    AuflageAbschaltungLeistungsbegrenzung = Column(Boolean)
+    AuflagenAbschaltungSchallimmissionsschutzNachts = Column(Boolean)
+    AuflagenAbschaltungSchallimmissionsschutzTagsueber = Column(Boolean)
+    AuflagenAbschaltungSchattenwurf = Column(Boolean)
+    AuflagenAbschaltungTierschutz = Column(Boolean)
+    AuflagenAbschaltungEiswurf = Column(Boolean)
+    AuflagenAbschaltungSonstige = Column(Boolean)
+    Nachtkennzeichen = Column(Boolean)
 
 
 class SolarExtended(Extended, Base):
@@ -82,8 +103,11 @@ class SolarExtended(Extended, Base):
     Leistungsbegrenzung = Column(String)
     InAnspruchGenommeneFlaeche = Column(Numeric(precision=18, scale=3))
     ArtDerFlaeche = Column(String)
+    ArtDerFlaecheIds = Column(String)
     InAnspruchGenommeneAckerflaeche = Column(Numeric(precision=18, scale=3))
     EegMastrNummer = Column(String)
+    Nutzungsbereich = Column(String)
+    Leistungsbegrenzung = Column(String)
 
 
 class BiomassExtended(Extended, Base):
