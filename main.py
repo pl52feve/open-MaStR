@@ -17,6 +17,7 @@ from sshtunnel import SSHTunnelForwarder
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from open_mastr import Mastr
+import os
 
 
 load_dotenv()
