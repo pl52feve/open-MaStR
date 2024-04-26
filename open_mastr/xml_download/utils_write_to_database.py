@@ -65,10 +65,9 @@ def write_mastr_xml_to_database(
                     xml_tablename=xml_tablename,
                     sql_tablename=sql_tablename,
                     if_exists="append",
-                    schema=engine._execution_options["schema_translate_map"]["_none"],
+                    #schema=engine._execution_options["schema_translate_map"]["_none"],
                     engine=engine,
                 )
-                alter_usergroup(engine=engine, table=sql_tablename)
     print("Bulk download and data cleansing were successful.")
 
 
@@ -190,7 +189,6 @@ def add_table_to_database(
     df: pd.DataFrame,
     xml_tablename: str,
     sql_tablename: str,
-    schema: str,
     if_exists: str,
     engine: sqlalchemy.engine.Engine,
 ) -> None:
@@ -217,7 +215,6 @@ def add_table_to_database(
                         con=con,
                         index=False,
                         if_exists=if_exists,
-                        schema=schema,
                         dtype=dtypes_for_writing_sql,
                     )
                     break

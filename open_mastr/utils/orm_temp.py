@@ -214,14 +214,21 @@ tablename_mapping = {
         },
     },
     "anlageneeggeothermiegrubengasdruckentspannung": {
-        "__name__": "anlageneeggeothermiegrubengasdruckentspannung",
+        "__name__": None,
         "__class__": None,
-        "replace_column_names": None,
+        "replace_column_names": {
+            "EegMaStRNummer": "EegMastrNummer",
+            "VerknuepfteEinheitenMaStRNummern": "VerknuepfteEinheit",
+        },
     },
     "einheitengeothermiegrubengasdruckentspannung": {
-        "__name__": "einheitengeothermiegrubengasdruckentspannung",
+        "__name__": None,
         "__class__": None,
-        "replace_column_names": None,
+        "replace_column_names": {
+            "EegMaStRNummer": "EegMastrNummer",
+            "KwkMaStRNummer": "KwkMastrNummer",
+            "LokationMaStRNummer": "LokationMastrNummer",
+        },
     },
     "anlageneegsolar": {
         "__name__": SolarEeg.__tablename__,
@@ -241,9 +248,13 @@ tablename_mapping = {
         },
     },
     "anlageneegspeicher": {
-        "__name__": "anlageneegspeicher",
+        "__name__": None,
         "__class__": None,
-        "replace_column_names": None,
+        "replace_column_names": {
+            "EegMaStRNummer": "EegMastrNummer",
+            "VerknuepfteEinheitenMaStRNummern": "VerknuepfteEinheit",
+            "Zuschlagsnummer": "eegZuschlagsnummer",
+        },
     },
     "anlageneegwasser": {
         "__name__": HydroEeg.__tablename__,
@@ -279,39 +290,61 @@ tablename_mapping = {
         },
     },
     "anlagengasspeicher": {
-        "__name__": "anlagengasspeicher",
+        "__name__": None,
         "__class__": None,
-        "replace_column_names": None,
+        "replace_column_names": {
+            "MaStRNummer": "MastrNummer",
+            "VerknuepfteEinheitenMaStRNummern": "VerknuepfteEinheit",
+        },
     },
     "einheitengasspeicher": {
-        "__name__": "einheitengasspeicher",
+        "__name__": None,
         "__class__": None,
-        "replace_column_names": None,
+        "replace_column_names": {
+            "LokationMaStRNummer": "LokationMastrNummer",
+            "SpeicherMaStRNummer": "SpeicherMastrNummer",
+        },
     },
     "anlagenkwk": {
-        "__name__": "anlagenkwk",
+        "__name__": None,
         "__class__": None,
-        "replace_column_names": None,
+        "replace_column_names": {
+            "VerknuepfteEinheitenMaStRNummern": "VerknuepfteEinheiten"
+        },
     },
     "anlagenstromspeicher": {
-        "__name__": "anlagenstromspeicher",
+        "__name__": None,
+        "__class__": None,
+        "replace_column_names": {
+            "MaStRNummer": "MastrNummer",
+            "VerknuepfteEinheitenMaStRNummern": "VerknuepfteEinheit",
+        },
+    },
+    "bilanzierungsgebiete": {
+        "__name__": None,
         "__class__": None,
         "replace_column_names": None,
     },
-    "bilanzierungsgebiete": {
-        "__name__": "bilanzierungsgebiete",
+    "einheitenaenderungnetzbetreiberzuordnungen": {
+        "__name__": None,
         "__class__": None,
         "replace_column_names": None,
     },
     "einheitengaserzeuger": {
-        "__name__": "einheitengaserzeuger",
+        "__name__": None,
         "__class__": None,
-        "replace_column_names": None,
+        "replace_column_names": {
+            "LokationMaStRNummer": "LokationMastrNummer",
+            "SpeicherMaStRNummer": "SpeicherMastrNummer",
+        },
     },
     "einheitengasverbraucher": {
-        "__name__": "einheitengasverbraucher",
+        "__name__": None,
         "__class__": None,
-        "replace_column_names": None,
+        "replace_column_names": {
+            "LokationMaStRNummer": "LokationMastrNummer",
+            "VerknuepfteEinheitenMaStRNummern": "VerknuepfteEinheit",
+        },
     },
     "einheitengenehmigung": {
         "__name__": Permit.__tablename__,
@@ -321,50 +354,67 @@ tablename_mapping = {
         },
     },
     "einheitenkernkraft": {
-        "__name__": "einheitenkernkraft",
+        "__name__": None,
         "__class__": None,
-        "replace_column_names": None,
+        "replace_column_names": {
+            "LokationMaStRNummer": "LokationMastrNummer",
+        },
     },
     "einheitenstromverbraucher": {
-        "__name__": "einheitenstromverbraucher",
+        "__name__": None,
         "__class__": None,
-        "replace_column_names": None,
+        "replace_column_names": {
+            "LokationMaStRNummer": "LokationMastrNummer",
+        },
     },
     "einheitenstromspeicher": {
-        "__name__": "einheitenstromspeicher",
+        "__name__": None,
         "__class__": None,
-        "replace_column_names": None,
+        "replace_column_names": {
+            "LokationMaStRNummer": "LokationMastrNummer",
+            "EegMaStRNummer": "EegMastrNummer",
+        },
     },
     "einheitenverbrennung": {
-        "__name__": "einheitenverbrennung",
+        "__name__": None,
         "__class__": None,
-        "replace_column_names": None,
+        "replace_column_names": {
+            "LokationMaStRNummer": "LokationMastrNummer",
+            "KwkMaStRNummer": "KwkMastrNummer",
+        },
     },
     "ertuechtigungen": {
-        "__name__": "ertuechtigungen",
+        "__name__": None,
         "__class__": None,
         "replace_column_names": None,
     },
     "geloeschteunddeaktivierteeinheiten": {
-        "__name__": "geloeschteunddeaktivierteeinheiten",
+        "__name__": None,
         "__class__": None,
         "replace_column_names": None,
     },
     "marktrollen": {
-        "__name__": "marktrollen",
+        "__name__": None,
         "__class__": None,
         "replace_column_names": None,
     },
     "marktakteure": {
-        "__name__": "marktakteure",
+        "__name__": None,
         "__class__": None,
         "replace_column_names": None,
     },
-    "netze": {"__name__": "netze", "__class__": None, "replace_column_names": None},
-    "netzanschlusspunkte": {
-        "__name__": "netzanschlusspunkte",
+    "netze": {
+        "__name__": None,
         "__class__": None,
         "replace_column_names": None,
+    },
+    "netzanschlusspunkte": {
+        "__name__": None,
+        "__class__": None,
+        "replace_column_names": {
+            "LokationMaStRNummer": "LokationMastrNummer",
+            "NetzMaStRNummer": "NetzMastrNummer",
+        },
     },
     "katalogkategorien": {
         "__name__": "katalogkategorien",
@@ -377,9 +427,12 @@ tablename_mapping = {
         "replace_column_names": None,
     },
     "lokationen": {
-        "__name__": "lokationen",
+        "__name__": None,
         "__class__": None,
-        "replace_column_names": None,
+        "replace_column_names": {
+            "VerknuepfteEinheitenMaStRNummern": "VerknuepfteEinheiten",
+            "NetzanschlusspunkteMaStRNummern": "Netzanschlusspunkte",
+        },
     },
     "einheitentypen": {
         "__name__": "einheitentypen",
@@ -387,3 +440,4 @@ tablename_mapping = {
         "replace_column_names": None,
     },
 }
+

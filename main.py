@@ -83,7 +83,8 @@ def mastr_temp_update():
         f"postgresql://{USERNAME_POSTGRES}:{PASSWORD_POSTGRES}@{LOCAL_HOST}:"
         f"{LOCAL_PORT}/{POSTGRES_DB}",
         echo=True,
-        execution_options={"schema_translate_map": {None: FACT_SCHEMA}},
+        connect_args={"options": f"-c search_path={FACT_SCHEMA}"}
+        #execution_options={"schema_translate_map": {None: FACT_SCHEMA}},
     )
 
     db = Mastr(engine=engine)
