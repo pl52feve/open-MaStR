@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import sqlalchemy
 from sqlalchemy import select, exc
+from sqlalchemy import select, exc
 from sqlalchemy.sql import text
 
 from open_mastr.utils.config import setup_logger
@@ -65,9 +66,12 @@ def write_mastr_xml_to_database(
                     xml_tablename=xml_tablename,
                     sql_tablename=sql_tablename,
                     if_exists="append",
-                    #schema=engine._execution_options["schema_translate_map"]["_none"],
+                    # schema=engine._execution_options["schema_translate_map"]["_none"],
                     engine=engine,
                 )
+
+                schema = engine._execution_options["schema_translate_map"]["_none"]
+                overwrite_usergroup(engine=engine, schema=schema, table=sql_tablename)
     print("Bulk download and data cleansing were successful.")
 
 
@@ -365,31 +369,50 @@ def handle_xml_syntax_error(data: str, err: Error) -> pd.DataFrame:
     df : pandas.DataFrame
         DataFrame which is read from the changed xml data.
     """
+    wrong_char_position = int(str(err).split()[-4])
+    decoded_data = data.decode("utf-16")
+    loop_condition = True
 
-    def find_nearest_brackets(xml_string: str, position: int) -> tuple[int, int]:
-        left_bracket_position = xml_string.rfind(">", 0, position)
-        right_bracket_position = xml_string.find("<", position)
-        return left_bracket_position, right_bracket_position
+    shift = 0
+    while loop_condition:
+        evaluated_string = decoded_data[wrong_char_position + shift]
+        if evaluated_string == ">":
+            start_char = wrong_char_position + shift + 1
+            break
+        else:
+            shift -= 1
+    loop_condition_2 = True
+    while loop_condition_2:
+        evaluated_string = decoded_data[start_char]
+        if evaluated_string == "<":
+            break
+        else:
+            decoded_data = decoded_data[:start_char] + decoded_data[start_char + 1 :]
+    df = pd.read_xml(decoded_data)
+    print("One invalid xml expression was deleted.")
+    return df
 
-    data = data.splitlines()
 
-    for _ in range(100):
-        # check for maximum of 100 syntax errors, otherwise return an error
-        wrong_char_row, wrong_char_column = err.position
-        row_with_error = data[wrong_char_row - 1]
+def overwrite_usergroup(engine: sqlalchemy.engine.Engine, schema: str, table: str):
+    """_summary_
 
-        left_bracket, right_bracket = find_nearest_brackets(
-            row_with_error, wrong_char_column
+    Parameters
+    ----------
+    engine : sqlalchemy.engine.Engine
+        _description_
+    schema : str
+        _description_
+    table : str
+        _description_
+    """
+    log = setup_logger()
+    ownership_query = text(f"ALTER TABLE {schema}.{table} OWNER TO sch_{schema}")
+    try:
+        with engine.connect() as connection:
+            connection.execute(ownership_query)
+            connection.commit()
+    except exc.SQLAlchemyError as sqlerr:
+        log.error(
+            f"The usergroup for {schema}.{table} couldn't be set correctly."
+            f"The process excited with {sqlerr}."
         )
-        data[wrong_char_row - 1] = (
-            row_with_error[: left_bracket + 1] + row_with_error[right_bracket:]
-        )
-        try:
-            print("One invalid xml expression was deleted.")
-            df = pd.read_xml(StringIO("\n".join(data)))
-            return df
-        except lxml.etree.XMLSyntaxError as e:
-            err = e
-            continue
-
-    raise Error("An error occured when parsing the xml file. Maybe it is corrupted?")
