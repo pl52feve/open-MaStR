@@ -27,6 +27,7 @@ def write_mastr_xml_to_database(
 ) -> None:
     """Write the Mastr in xml format into a database defined by the engine parameter."""
     include_tables = data_to_include_tables(data, mapping="write_xml")
+    cleared_tables = set()
 
     with ZipFile(zipped_xml_file_path, "r") as f:
         files_list = f.namelist()
@@ -39,6 +40,12 @@ def write_mastr_xml_to_database(
                 xml_tablename=xml_tablename, include_tables=include_tables
             ):
                 sql_tablename = tablename_mapping[xml_tablename]["__name__"]
+                if sql_tablename not in cleared_tables:
+                    print(f"Cleared {sql_tablename}")
+                    with engine.connect() as con:
+                        with con.begin():
+                            con.execute(text(f"TRUNCATE TABLE temp_mastr.{sql_tablename}"))
+                    cleared_tables.add(sql_tablename)
 
                 if is_first_file(file_name):
                     create_database_table(engine=engine, xml_tablename=xml_tablename)
