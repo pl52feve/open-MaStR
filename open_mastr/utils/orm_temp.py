@@ -312,6 +312,11 @@ tablename_mapping = {
             "VerknuepfteEinheitenMaStRNummern": "VerknuepfteEinheiten"
         },
     },
+    "geloeschteunddeaktiviertemarktakteure": {
+        "__name__": None,
+        "__class__": None,
+        "replace_column_names": None,
+    },
     "anlagenstromspeicher": {
         "__name__": None,
         "__class__": None,
