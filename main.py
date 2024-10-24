@@ -17,7 +17,7 @@ from sshtunnel import SSHTunnelForwarder
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from open_mastr import Mastr
-import os
+from scripts.postprocessing import capacity_update
 
 
 load_dotenv()
@@ -97,6 +97,7 @@ if __name__ == "__main__":
         start = time.time()
         result = retry_function(mastr_temp_update)
         print(f"Function succeeded with result: {result}")
+        capacity_update()
         print(time.time()-start)
     except Exception as err:
         mail_handler.exception(
