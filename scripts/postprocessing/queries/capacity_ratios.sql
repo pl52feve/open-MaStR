@@ -1,9 +1,9 @@
-
 TRUNCATE TABLE temp_mastr.{{gen_type}}_capa;
 INSERT INTO temp_mastr.{{gen_type}}_capa (date_id, capa)
 WITH RECURSIVE date_series AS (
+    -- Extend the series to include "tomorrow"
     SELECT
-        generate_series('2018-06-01'::date, CURRENT_DATE, '1 day'::interval)::date AS date_id
+        generate_series('2018-06-01'::date, CURRENT_DATE + INTERVAL '1 day', '1 day'::interval)::date AS date_id
 ),
 daily_start_grouped AS (
     SELECT
@@ -11,7 +11,7 @@ daily_start_grouped AS (
         SUM("Bruttoleistung") AS daily_sum
     FROM
         temp_mastr.{{gen_type}}_extended
-	 WHERE
+    WHERE
         NOT ("Inbetriebnahmedatum" IS NULL AND "DatumEndgueltigeStilllegung" IS NULL)
     GROUP BY
         start_date
@@ -28,42 +28,44 @@ cumsum_start_plants AS (
     ORDER BY
         start_date
 ),
--- Recursive CTE to forward-fill the missing values in netto_cumsum
 filled_start_data AS (
-    -- Base case: Start with the first date and the corresponding netto_cumsum value
+    -- Start with the first date in date_series
     SELECT
-        ds.date_id ,
-        cp.start_netto_cumsum
+        ds.date_id,
+        csp.start_netto_cumsum
     FROM
         date_series ds
     LEFT JOIN
-        cumsum_start_plants cp ON cp.start_date = ds.date_id
+        cumsum_start_plants csp ON csp.start_date = ds.date_id
     WHERE
         ds.date_id = (SELECT MIN(date_id) FROM date_series)
 
     UNION ALL
 
-    -- Recursive case: Carry forward the last non-null netto_cumsum value for missing dates
+    -- Recursively carry forward the last known cumulative value, ensuring it's never reset to NULL or zero
     SELECT
         ds.date_id,
-        COALESCE(cp.start_netto_cumsum, fd.start_netto_cumsum) AS start_netto_cumsum
+        CASE
+            WHEN csp.start_netto_cumsum IS NOT NULL THEN csp.start_netto_cumsum
+            ELSE fsd.start_netto_cumsum
+        END AS start_netto_cumsum
     FROM
         date_series ds
     LEFT JOIN
-        cumsum_start_plants cp ON cp.start_date = ds.date_id
+        cumsum_start_plants csp ON csp.start_date = ds.date_id
     JOIN
-        filled_start_data fd ON ds.date_id = fd.date_id + INTERVAL '1 day'
+        filled_start_data fsd ON ds.date_id = fsd.date_id + INTERVAL '1 day'
     WHERE
         ds.date_id > (SELECT MIN(date_id) FROM date_series)
 ),
----------------------------------------------------------------------------------------------------------
 daily_end_grouped AS (
     SELECT
-        COALESCE("DatumEndgueltigeStilllegung", CURRENT_DATE + INTERVAL '1 day')::date AS end_date,
+        -- plus 5 days is randomly chosen just needs to be sufficiently far in the future
+        COALESCE("DatumEndgueltigeStilllegung", CURRENT_DATE + INTERVAL '5 day')::date AS end_date,
         SUM("Bruttoleistung") AS daily_sum
     FROM
         temp_mastr.{{gen_type}}_extended
-	WHERE
+    WHERE
         NOT ("Inbetriebnahmedatum" IS NULL AND "DatumEndgueltigeStilllegung" IS NULL)
     GROUP BY
         end_date
@@ -80,39 +82,44 @@ cumsum_end_plants AS (
     ORDER BY
         end_date
 ),
--- Recursive CTE to forward-fill the missing values in netto_cumsum
 filled_end_data AS (
-    -- Base case: Start with the first date and the corresponding netto_cumsum value
+    -- Start with the first date in date_series
     SELECT
-        ds.date_id ,
-        cp.end_netto_cumsum
+        ds.date_id,
+        cep.end_netto_cumsum
     FROM
         date_series ds
     LEFT JOIN
-        cumsum_end_plants cp ON cp.end_date = ds.date_id
+        cumsum_end_plants cep ON cep.end_date = ds.date_id
     WHERE
         ds.date_id = (SELECT MIN(date_id) FROM date_series)
 
     UNION ALL
 
-    -- Recursive case: Carry forward the last non-null netto_cumsum value for missing dates
+    -- Recursively carry forward the last known cumulative value, ensuring it's never reset to NULL or zero
     SELECT
         ds.date_id,
-        COALESCE(cp.end_netto_cumsum, fd.end_netto_cumsum) AS end_netto_cumsum
+        CASE
+            WHEN cep.end_netto_cumsum IS NOT NULL THEN cep.end_netto_cumsum
+            ELSE fed.end_netto_cumsum
+        END AS end_netto_cumsum
     FROM
         date_series ds
     LEFT JOIN
-        cumsum_end_plants cp ON cp.end_date = ds.date_id
+        cumsum_end_plants cep ON cep.end_date = ds.date_id
     JOIN
-        filled_end_data fd ON ds.date_id = fd.date_id + INTERVAL '1 day'
+        filled_end_data fed ON ds.date_id = fed.date_id + INTERVAL '1 day'
     WHERE
         ds.date_id > (SELECT MIN(date_id) FROM date_series)
 )
 SELECT
     fd_start.date_id,
-    (fd_start.start_netto_cumsum-fd_end.end_netto_cumsum)::numeric(18,3) AS capa
+    (COALESCE(fd_start.start_netto_cumsum, 0) - COALESCE(fd_end.end_netto_cumsum, 0))::numeric(18,3) AS capa
 FROM
     filled_start_data fd_start
 FULL OUTER JOIN
     filled_end_data fd_end ON fd_start.date_id = fd_end.date_id
-	where fd_start.date_id >= '2019-01-01'::date;
+WHERE
+    fd_start.date_id >= '2019-01-01'::date
+ORDER BY
+    fd_start.date_id;
