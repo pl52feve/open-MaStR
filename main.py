@@ -93,13 +93,13 @@ def mastr_temp_update():
 
 if __name__ == "__main__":
     # update MaStR
-    #try:
-    start = time.time()
-    # result = retry_function(mastr_temp_update)
-    # print(f"Function succeeded with result: {result}")
-    capacity_update.update_capacities()
-    print(time.time()-start)
-    # except Exception as err:
-    #     mail_handler.exception(
-    #         f"After three retries MaStR couldn't be updatet with {err}."
-    #     )
+    try:
+        start = time.time()
+        result = retry_function(mastr_temp_update)
+        print(f"Function succeeded with result: {result}")
+        capacity_update.update_capacities()
+        print(time.time()-start)
+    except Exception as err:
+        mail_handler.exception(
+            f"After three retries MaStR couldn't be updatet with {err}."
+        )

@@ -20,6 +20,7 @@ class Extended(object):
     Registrierungsdatum = Column(Date)
     EinheitMastrNummer = Column(String, primary_key=True)
     DatumLetzteAktualisierung = Column(DateTime(timezone=True))
+    LokationMastrNummer = Column(String)
     Land = Column(String)
     Bundesland = Column(String)
     Landkreis = Column(String)
@@ -192,6 +193,26 @@ class Permit(Base):
     Meldedatum = Column(Date)
     VerknuepfteEinheiten = Column(String)
     Netzbetreiberzuordnungen = Column(String)
+
+class GridConnections(Base):
+    __tablename__ = "grid_connections"
+
+    NetzanschlusspunktMastrNummer = Column(String, primary_key=True)
+    NetzanschlusspunktBezeichnung = Column(String)
+    LetzteAenderung = Column(DateTime(timezone=True))
+    LokationMastrNummer = Column(String)
+    Lokationtyp = Column(String)
+    MaximaleEinspeiseleistung = Column(Float)
+    Gasqualitaet = Column(String)
+    NetzMastrNummer = Column(String)
+    NochInPlanung = Column(Boolean)
+    NameDerTechnischenLokation = Column(String)
+    MaximaleAusspeiseleistung = Column(Float)
+    Messlokation = Column(String)
+    Spannungsebene = Column(String)
+    BilanzierungsgebietNetzanschlusspunktId = Column(Integer)
+    Nettoengpassleistung = Column(Float)
+    Netzanschlusskapazitaet = Column(Float)
 
 
 tablename_mapping = {
@@ -413,14 +434,6 @@ tablename_mapping = {
         "__class__": None,
         "replace_column_names": None,
     },
-    "netzanschlusspunkte": {
-        "__name__": None,
-        "__class__": None,
-        "replace_column_names": {
-            "LokationMaStRNummer": "LokationMastrNummer",
-            "NetzMaStRNummer": "NetzMastrNummer",
-        },
-    },
     "katalogkategorien": {
         "__name__": "katalogkategorien",
         "__class__": None,
@@ -443,6 +456,14 @@ tablename_mapping = {
         "__name__": "einheitentypen",
         "__class__": None,
         "replace_column_names": None,
+    },
+    "netzanschlusspunkte": {
+        "__name__": GridConnections.__tablename__,
+        "__class__": GridConnections,
+        "replace_column_names": {
+            "LokationMaStRNummer": "LokationMastrNummer",
+            "NetzMaStRNummer": "NetzMastrNummer",
+        },
     },
 }
 
