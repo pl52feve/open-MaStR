@@ -1,5 +1,5 @@
 
-.. image:: https://user-images.githubusercontent.com/14353512/199113556-4b53660f-c628-4138-8d01-3719595ecda1.png
+.. image:: docs/images/README_HeaderThreePartners.svg
     :align: left
     :target: https://github.com/OpenEnergyPlatform/open-MaStR
     :alt: MaStR logo
@@ -20,11 +20,13 @@ open-mastr
    * - Tests
      - |badge_ci|
    * - Publication
-     - |badge_pypi| |badge_zenodo|
+     - |badge_pypi| |badge_joss|
+   * - Data Publication
+     - |badge_zenodo|
    * - Development
      - |badge_issue_open| |badge_issue_closes| |badge_pr_open| |badge_pr_closes|
    * - Community
-     - |badge_contributing| |badge_contributors| |badge_repo_counts| |PyPI download month|
+     - |badge_contributing| |badge_contributors| |badge_repo_counts| |PyPI download month| |Total PyPI downloads|
    
 
 .. contents::
@@ -53,12 +55,10 @@ The MaStR data can be
 Documentation
 =============
 
-| The documentation is in `sphinx <http://www.sphinx-doc.org/en/stable/>`_ reStructuredText format in the ``doc`` sub-folder of the repository.
+| The documentation is in `Material for Mkdocs <https://squidfunk.github.io/mkdocs-material/>`_ markdown format in the ``doc`` sub-folder of the repository.
 | Find the `documentation <https://open-mastr.readthedocs.io/en/latest/>`_ hosted on ReadTheDocs.
 
 | The original API documentation can be found on the `Webhilfe des Marktstammdatenregisters <https://www.marktstammdatenregister.de/MaStRHilfe/subpages/webdienst.html>`_.
-| If you are interested in browsing the MaStR online, check out the privately hosted `Marktstammdatenregister.dev <https://marktstammdatenregister.dev/>`_.
-| Also see the `bundesAPI/Marktstammdaten-API <https://github.com/bundesAPI/marktstammdaten-api>`_ for another implementation.
 
 
 Installation
@@ -97,7 +97,7 @@ Install the package with
 
 .. code-block:: python
 
-    python setup.py install
+    pip install "open_mastr[dev]"
 
 
 Examples of Usage
@@ -108,9 +108,15 @@ changes in a `Pull Request <https://github.com/OpenEnergyPlatform/open-MaStR/pul
 
 - `PV- und Windflächenrechner <https://www.agora-energiewende.de/service/pv-und-windflaechenrechner/>`_
 - `Wasserstoffatlas <https://wasserstoffatlas.de/>`_
-- `EE-Status App <https://ee-status.herokuapp.com/>`_
+- `EE-Status App <https://ee-status.de/>`_
+- `Digiplan Anhalt <https://digiplan.rl-institut.de/>`_
+- `Data Quality Assessment of the MaStR <https://marktstammdaten.kotthoff.dev/>`_
 
-
+External Resources
+===================
+Besides open-mastr, some other resources exist that ease the process of working with the Marktstammdatenregister:
+- If you are interested in browsing the MaStR online, check out the github organisation `Marktstammdatenregister.dev <https://github.com/marktstammdatenregister-dev>`_.
+- The `bundesAPI/Marktstammdaten-API <https://github.com/bundesAPI/marktstammdaten-api>`_ is another implementation to access data via an official API.
 
 Collaboration
 =============
@@ -127,7 +133,7 @@ Software
 | This repository is licensed under the **GNU Affero General Public License v3.0 or later** (AGPL-3.0-or-later).
 | See `LICENSE.md <https://github.com/OpenEnergyPlatform/open-MaStR/blob/production/LICENSE.md>`_ for rights and obligations.
 | See the *Cite this repository* function or `CITATION.cff <https://github.com/OpenEnergyPlatform/open-MaStR/blob/production/CITATION.cff>`_ for citation of this repository.
-| Copyright: `open-MaStR <https://github.com/OpenEnergyPlatform/open-MaStR/>`_ © `Reiner Lemoine Institut <https://reiner-lemoine-institut.de/>`_ © `fortiss <https://www.fortiss.org/>`_  | `AGPL-3.0-or-later <https://www.gnu.org/licenses/agpl-3.0.txt>`_
+| Copyright: `open-MaStR <https://github.com/OpenEnergyPlatform/open-MaStR/>`_ © `Reiner Lemoine Institut <https://reiner-lemoine-institut.de/>`_ © `fortiss <https://www.fortiss.org/>`_ © `OFFIS <https://www.offis.de/>`_  | `AGPL-3.0-or-later <https://www.gnu.org/licenses/agpl-3.0.txt>`_
 
 Data
 ----
@@ -152,7 +158,7 @@ Data
     :alt: PyPI
 
 .. |badge_zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.6807426.svg
-    :target: https://doi.org/10.5281/zenodo.6807426
+    :target: https://doi.org/10.5281/zenodo.6807425
     :alt: zenodo
 
 .. |badge_issue_open| image:: https://img.shields.io/github/issues-raw/OpenEnergyPlatform/open-MaStR
@@ -173,8 +179,16 @@ Data
 .. |badge_contributors| image:: https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square
     :alt: contributors
 
-.. |badge_repo_counts| image:: http://hits.dwyl.com/OpenEnergyPlatform/open-MaStR.svg
+.. |badge_repo_counts| image:: https://hits.dwyl.com/OpenEnergyPlatform/open-MaStR.svg
     :alt: counter
     
 .. |PyPI download month| image:: https://img.shields.io/pypi/dm/open-mastr?label=PyPi%20Downloads
-    :target: https://pypi.org/project/open-mastr/
+    :target: https://pypistats.org/packages/open-mastr
+
+.. |Total PyPI downloads| image:: https://static.pepy.tech/badge/open-mastr
+    :target: https://pepy.tech/project/open-mastr
+
+.. |badge_joss| image:: https://joss.theoj.org/papers/dc0d33e7dc74f7233e15a7b6fe0c7a3e/status.svg
+    :target: https://joss.theoj.org/papers/dc0d33e7dc74f7233e15a7b6fe0c7a3e
+
+

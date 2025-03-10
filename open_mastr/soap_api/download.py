@@ -29,42 +29,48 @@ class MaStRAPI(object):
     """
     Access the Marktstammdatenregister (MaStR) SOAP API via a Python wrapper
 
-    :ref:`Read about <MaStR account and credentials>`
+    Read about [MaStR account and credentials](../advanced.md/#mastr-account-and-credentials)
     how to create a user account and a role including a token to access the
     MaStR SOAP API.
 
-    Create an :class:`.MaStRAPI()` instance with your role credentials
+    Create an `MaStRAPI` instance with your role credentials
 
-    .. code-block:: python
+    ```python
 
        mastr_api = MaStRAPI(
             user="SOM123456789012",
-            key=""koo5eixeiQuoi'w8deighai8ahsh1Ha3eib3coqu7ceeg%ies..."
+            key="koo5eixeiQuoi'w8deighai8ahsh1Ha3eib3coqu7ceeg%ies...",
+            service_port="Anlage"
        )
+    ```
 
     Alternatively, leave `user` and `key` empty if user and token are accessible via
     `credentials.cfg`. How to configure this is described
-    :ref:`here <MaStR account and credentials>`.
+    [here](../advanced.md/#mastr-account-and-credentials).
 
-    .. code-block:: python
+    ```python
 
         mastr_api = MaStRAPI()
+    ```
 
-    Now, you can use the MaStR API instance to call `pre-defined SOAP API
-    queries
-    <https://www.marktstammdatenregister.de/MaStRHilfe/files/webdienst/Funktionen_MaStR_Webdienste_V1.2.39.html>`_
-    via the class' methods.
+    Now, you can use the MaStR API instance to call pre-defined SOAP API
+    queries via the class' methods. A documentation of all API methods
+    is available at the
+    [BNetzA website](https://www.marktstammdatenregister.de/MaStRHilfe/subpages/webdienst.html)
+    within the downloadable zip folder `Dienstbeschreibung Produktion Version X.X.X`
     For example, get a list of units limited to two entries.
 
-    .. code-block:: python
+    ```python
 
        mastr_api.GetListeAlleEinheiten(limit=2)
+    ```
 
-    Note, as the example shows, you don't have to pass credentials for calling
-    wrapped SOAP queries. This is handled internally.
+    !!! Note
+        As the example shows, you don't have to pass credentials for calling
+        wrapped SOAP queries. This is handled internally.
     """
 
-    def __init__(self, user=None, key=None):
+    def __init__(self, user=None, key=None, service_port="Anlage"):
         """
         Parameters
         ----------
@@ -75,10 +81,15 @@ class MaStRAPI(object):
         key : str , optional
             Access token of a role (Benutzerrolle). Might look like:
             "koo5eixeiQuoi'w8deighai8ahsh1Ha3eib3coqu7ceeg%ies..."
+        service_port : str , optional
+            Port/model to be used, e.g. "Anlage" or "Akteur", see docs for
+            full list:
+            https://www.marktstammdatenregister.de/MaStRHilfe/subpages/webdienst.html
+            Defaults to "Anlage".
         """
 
         # Bind MaStR SOAP API functions as instance methods
-        client, client_bind = _mastr_bindings()
+        client, client_bind = _mastr_bindings(service_port=service_port)
 
         # First, all services of registered service_port (i.e. 'Anlage')
         for n, f in client_bind:
@@ -135,19 +146,27 @@ class MaStRAPI(object):
 
 
 def _mastr_bindings(
+    service_port,
+    service_name="Marktstammdatenregister",
+    wsdl="https://www.marktstammdatenregister.de/MaStRAPI/wsdl/mastr.wsdl",
     max_retries=3,
     pool_connections=100,
     pool_maxsize=100,
     timeout=60,
     operation_timeout=600,
-    wsdl="https://www.marktstammdatenregister.de/MaStRAPI/wsdl/mastr.wsdl",
-    service_name="Marktstammdatenregister",
-    service_port="Anlage",
 ):
     """
 
     Parameters
     ----------
+    service_port : str
+        Port of service to be used. Parameters is passed to `zeep.Client.bind`
+        See :class:`MaStRAPI` for more information.
+    service_name : str
+        Service, defined in wsdl file, that is to be used. Parameters is
+        passed to zeep.Client.bind
+    wsdl : str
+        Url of wsdl file to be used. Parameters is passed to zeep.Client
     max_retries : int
         Maximum number of retries for a request. Parameters is passed to
         requests.adapters.HTTPAdapter
@@ -163,14 +182,6 @@ def _mastr_bindings(
     operation_timeout : int
         Timeout for API requests (GET/POST in underlying requests package)
         in seconds. Parameter is passed to `zeep.transports.Transport`.
-    wsdl : str
-        Url of wsdl file to be used. Parameters is passed to zeep.Client
-    service_name : str
-        Service, defined in wsdl file, that is to be used. Parameters is
-        passed to zeep.Client.bind
-    service_port : str
-        Port of service to be used. Parameters is
-        passed to zeep.Client.bind
 
     Returns
     -------
@@ -411,14 +422,21 @@ def _missed_units_to_file(data, data_type, missed_units):
 
 
 class MaStRDownload:
-    """Use the higher level interface for bulk download
+    """
+    !!! warning
 
-    :class:`.MaStRDownload` builds on top of :class:`.MaStRAPI()` and provides
+        **This class is deprecated** and will not be maintained from version 0.15.0 onwards.
+        Instead use [`Mastr.download`][open_mastr.Mastr.download] with parameter
+        `method` = "bulk" to get bulk downloads of the dataset.
+
+    Use the higher level interface for bulk download
+
+    `MaStRDownload` builds on top of [`MaStRAPI`][open_mastr.soap_api.download.MaStRAPI] and provides
     an interface for easier downloading.
     Use methods documented below to retrieve specific data. On the example of
     data for nuclear power plants, this looks like
 
-    .. code-block:: python
+    ```python
 
         from open_mastr.soap_api.download import MaStRDownload
 
@@ -427,10 +445,11 @@ class MaStRDownload:
         for tech in ["nuclear", "hydro", "wind", "solar", "biomass", "combustion", "gsgk"]:
             power_plants = mastr_dl.download_power_plants(tech, limit=10)
             print(power_plants.head())
+    ```
 
-    .. warning::
+    !!! warning
 
-        Be careful with increasing `limit`. Typically, your account allows only for 10.000 API
+        Be careful with increasing `limit`. Typically, your account allows only for 10,000 API
         request per day.
 
     """
@@ -447,6 +466,17 @@ class MaStRDownload:
             multiprocessing package) choose False.
             Defaults to number of cores (including hyperthreading).
         """
+        log.warning(
+            """
+            The `MaStRDownload` class is deprecated and will not be maintained in the future.
+            To get a full table of the Marktstammdatenregister, use the open_mastr.Mastr.download
+            method.
+
+            If this change causes problems for you, please comment in this issue on github:
+            https://github.com/OpenEnergyPlatform/open-MaStR/issues/487
+
+            """
+        )
 
         # Number of parallel processes
         if parallel_processes == "max":
@@ -588,14 +618,13 @@ class MaStRDownload:
             * 'combustion'
             * 'gsgk'
             * 'storage'
-
         limit : int
-            Maximum number of units to be downloaded. Defaults to :code:`None`.
+            Maximum number of units to be downloaded.
 
         Returns
         -------
         pd.DataFrame
-            Joined data tables
+            Joined data tables.
         """
         # Create data version directory
         create_data_dir()
@@ -693,7 +722,7 @@ class MaStRDownload:
         # Remove duplicates
         joined_data.drop_duplicates(inplace=True)
 
-        to_csv(joined_data, data) #FIXME: reference to helpers im import
+        to_csv(joined_data, data)  # FIXME: reference to helpers im import
 
         return joined_data
 
@@ -717,18 +746,16 @@ class MaStRDownload:
         data : str, optional
             Technology data is requested for. See :meth:`MaStRDownload.download_power_plants`
             for options.
-            Data is retrieved using :meth:`MaStRAPI.GetGefilterteListeStromErzeuger`.
+            Data is retrieved using `MaStRAPI.GetGefilterteListeStromErzeuger`.
             If not given, it defaults to `None`. This implies data for all available
             technologies is retrieved using the web service function
-            :meth:`MaStRAPI.GetListeAlleEinheiten`.
+            `MaStRAPI.GetListeAlleEinheiten`.
         limit : int, optional
             Maximum number of units to download.
             If not provided, data for all units is downloaded.
 
-            .. warning:
-
-               Mind the daily request limit for your MaStR account.
-
+            !!! warning
+                Mind the daily request limit for your MaStR account.
         date_from: `datetime.datetime()`, optional
             If specified, only units with latest change date newer than this are queried.
             Defaults to `None`.
@@ -761,26 +788,30 @@ class MaStRDownload:
             log.info(
                 f"Get list of units with basic information for data type {data} ({et})"
             )
-            yield from basic_data_download(
-                self._mastr_api,
-                "GetListeAlleEinheiten",
-                "Einheiten",
-                chunks_start,
-                limits,
-                date_from,
-                max_retries,
-                data,
-                et=et,
-            ) if et is None else basic_data_download(
-                self._mastr_api,
-                "GetGefilterteListeStromErzeuger",
-                "Einheiten",
-                chunks_start,
-                limits,
-                date_from,
-                max_retries,
-                data,
-                et=et,
+            yield from (
+                basic_data_download(
+                    self._mastr_api,
+                    "GetListeAlleEinheiten",
+                    "Einheiten",
+                    chunks_start,
+                    limits,
+                    date_from,
+                    max_retries,
+                    data,
+                    et=et,
+                )
+                if et is None
+                else basic_data_download(
+                    self._mastr_api,
+                    "GetGefilterteListeStromErzeuger",
+                    "Einheiten",
+                    chunks_start,
+                    limits,
+                    date_from,
+                    max_retries,
+                    data,
+                    et=et,
+                )
             )
 
     def additional_data(self, data, unit_ids, data_fcn, timeout=10):
@@ -810,21 +841,19 @@ class MaStRDownload:
             * "kwk_unit_data" (:meth:`~.kwk_unit_data`): Unit information from KWK unit registry.
             * "permit_unit_data" (:meth:`~.permit_unit_data`): Information about the permit
               process of a unit.
-
         timeout: int, optional
-            Timeout limit for data retrieval for each unit when using multiprocessing
+            Timeout limit for data retrieval for each unit when using multiprocessing. Defaults to 10.
 
         Returns
         -------
         tuple of list of dict and tuple
-            Returns additional data in dictionaries that are packed into a list. Format
-
-            .. code-block:: python
-
-               return = (
+            Returns additional data in dictionaries that are packed into a list.
+            ```python
+                return = (
                     [additional_unit_data_dict1, additional_unit_data_dict2, ...],
                     [tuple("SME930865355925", "Reason for failing dowload"), ...]
                     )
+            ```
         """
         # Prepare a list of unit IDs packed as tuple associated with data
         prepared_args = list(product(unit_ids, [data]))
@@ -884,7 +913,6 @@ class MaStRDownload:
         with multiprocessing.Pool(
             processes=self.parallel_processes, maxtasksperchild=1
         ) as pool:
-
             with tqdm(
                 total=len(prepared_args),
                 desc=f"Downloading {data_fcn} ({data})",
@@ -926,9 +954,10 @@ class MaStRDownload:
         unit_specs : tuple
             *EinheitMastrNummer* and data type as tuple that for example looks like
 
-            .. code-block:: python
+            ```python
 
                tuple("SME930865355925", "hydro")
+            ```
 
         Returns
         -------
@@ -938,9 +967,10 @@ class MaStRDownload:
         tuple
             *EinheitMastrNummer* and message the explains why a download failed. Format
 
-            .. code-block:: python
+            ```python
 
                tuple("SME930865355925", "Reason for failing dowload")
+            ```
         """
 
         mastr_id, data = unit_specs
@@ -987,9 +1017,10 @@ class MaStRDownload:
         tuple
             *EegMastrNummer* and message the explains why a download failed. Format
 
-            .. code-block:: python
+            ```python
 
                tuple("EEG961554380393", "Reason for failing dowload")
+            ```
         """
         eeg_id, data = unit_specs
         try:
@@ -1013,7 +1044,8 @@ class MaStRDownload:
 
     def kwk_unit_data(self, unit_specs):
         """
-        Download KWK (Kraft-Wärme-Kopplung) data for a unit.
+        Download KWK (german: Kraft-Wärme-Kopplung, english: Combined Heat and Power, CHP)
+        data for a unit.
 
         Additional data collected during a subsidy program for supporting
         combined heat power plants.
@@ -1023,9 +1055,10 @@ class MaStRDownload:
         unit_specs : tuple
             *KwkMastrnummer* and data type as tuple that for example looks like
 
-            .. code-block:: python
+            ```python
 
                tuple("KWK910493229164", "biomass")
+            ```
 
 
         Returns
@@ -1036,9 +1069,10 @@ class MaStRDownload:
         tuple
             *KwkMastrNummer* and message the explains why a download failed. Format
 
-            .. code-block:: python
+            ```python
 
                tuple("KWK910493229164", "Reason for failing dowload")
+            ```
         """
         kwk_id, data = unit_specs
         try:
@@ -1069,9 +1103,10 @@ class MaStRDownload:
         unit_specs : tuple
             *GenMastrnummer* and data type as tuple that for example looks like
 
-            .. code-block:: python
+            ```python
 
                tuple("SGE952474728808", "biomass")
+            ```
 
 
         Returns
@@ -1082,9 +1117,10 @@ class MaStRDownload:
         tuple
             *GenMastrNummer* and message the explains why a download failed. Format
 
-            .. code-block:: python
+            ```python
 
                tuple("GEN952474728808", "Reason for failing dowload")
+            ```
         """
         permit_id, data = unit_specs
         try:
@@ -1118,9 +1154,10 @@ class MaStRDownload:
         specs : tuple
             Location *Mastrnummer* and data_name as tuple that for example looks like
 
-            .. code-block:: python
+            ```python
 
                tuple("SEL927688371072", "location_elec_generation")
+            ```
 
 
         Returns
@@ -1131,9 +1168,10 @@ class MaStRDownload:
         tuple
             Location *MastrNummer* and message the explains why a download failed. Format
 
-            .. code-block:: python
+            ```python
 
                tuple("SEL927688371072", "Reason for failing dowload")
+            ```
         """
 
         # Unpack tuple argument to two separate variables
@@ -1204,7 +1242,7 @@ class MaStRDownload:
         Retrieve basic location data in chunks
 
         Retrieves data for all types of locations at once using
-        :meth:`MaStRAPI.GetListeAlleLokationen`.
+        `MaStRAPI.GetListeAlleLokationen`.
         Locations include
 
         * Electricity generation location (SEL - Stromerzeugungslokation)
@@ -1216,15 +1254,11 @@ class MaStRDownload:
         ----------
         limit: int, optional
             Maximum number of locations to download.
-            Defaults to 2000.
 
-            .. warning:
-
-               Mind the daily request limit for your MaStR account.
-
-        date_from: :obj:`datetime.datetime`, optional
+            !!! warning
+                Mind the daily request limit for your MaStR account, usually 10,000 per day.
+        date_from: `datetime.datetime`, optional
             If specified, only locations with latest change date newer than this are queried.
-            Defaults to :obj:`None`.
         max_retries: int, optional
             Maximum number of retries for each chunk in case of errors with the connection to
             the server.
@@ -1235,7 +1269,7 @@ class MaStRDownload:
             For each chunk a separate generator is returned all wrapped into another generator.
             Access with
 
-            .. code-block:: python
+            ```python
 
                 chunks = mastr_dl.basic_location_data(
                     date_from=datetime.datetime(2020, 11, 7, 0, 0, 0), limit=2010
@@ -1244,6 +1278,7 @@ class MaStRDownload:
                 for chunk in chunks:
                     for location in chunk:
                         print(location) # prints out one dict per location one after another
+            ```
         """
         # Prepare indices for chunked data retrieval
         chunksize = 2000

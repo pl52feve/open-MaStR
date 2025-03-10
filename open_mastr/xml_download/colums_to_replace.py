@@ -49,6 +49,7 @@ columns_replace_list = [
     "Nutzungsbereich",
     "Nebenausrichtung",
     "NebenausrichtungNeigungswinkel",
+    "ArtDerFlaecheIds",
     # einheitenstromspeicher
     "AcDcKoppelung",
     "Batterietechnologie",
@@ -56,6 +57,8 @@ columns_replace_list = [
     "Pumpspeichertechnologie",
     "Einsatzort",
     # geloeschteunddeaktivierteEinheiten
+    # geloeschteunddeaktivierteMarktAkteure
+    "MarktakteurStatus",
     # lokationen
     # marktakteure
     "Personenart",
@@ -75,6 +78,8 @@ columns_replace_list = [
     # anlagengasspeicher
     # anlagenkwk
     # bilanzierungsgebiete
+    # einheitenaenderungnetzbetreiberzuordnungen
+    "ArtDerAenderung",
     # einheitenbiomasse
     "Hauptbrennstoff",
     "Biomasseart",
@@ -105,4 +110,6 @@ columns_replace_list = [
     "Seelage",
     "ClusterNordsee",
     "ClusterOstsee",
+    # various tables
+    "NetzbetreiberpruefungStatus",
 ]
